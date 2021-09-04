@@ -29,22 +29,33 @@ if ( !class_exists( 'WebaraTrackingCookie') )
         {
             global $wp;
             $firstvisit = "first_visit";
-            $nextcookie = "with-esc-html";
-            $uri = esc_html(add_query_arg( $wp->query_vars, home_url( $wp->request ) ));
+            $uri = add_query_arg( $wp->query_vars, home_url( $wp->request ) );
 
             if (isset($_COOKIE[$firstvisit])) 
             {
+                //$this->check_cookie();
+                parse_str(strpbrk($uri, "utm_"), $testArray);
                 
+                foreach ($testArray as $key => $value)
+                {
+                    echo "<br>$key => $value";
+                }
+                //echo"<script>alert('" . $testArray . "')</script>";
             }
             else
             {
-                setcookie($firstvisit, $uri, time() + 84600 * 365, COOKIEPATH, COOKIE_DOMAIN, $secure = true, $httponly = true);
+                setcookie($firstvisit, $uri, time() + 84600 * 365, COOKIEPATH, COOKIE_DOMAIN);
             }
         }
 
 
+
+
+    
+
     }
 
 }
-
 new WebaraTrackingCookie;
+
+
