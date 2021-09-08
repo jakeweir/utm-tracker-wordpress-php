@@ -18,14 +18,14 @@ if ( !defined( 'ABSPATH' ) )
 
 if ( !class_exists( 'WebaraTrackingCookie') )
 {
-    class WebaraTrackingCookie
+    class Webara_Tracking_Cookie_Plugin
     {
-        public function __construct()
+        function __construct()
         {
             add_action('init', array($this, 'create_cookie'));
         }
 
-        public function create_cookie()
+        function create_cookie()
         {
             global $wp;
             $firstvisit = "first_visit";
@@ -40,13 +40,24 @@ if ( !class_exists( 'WebaraTrackingCookie') )
                 {
                     echo "<br>$key => $value";
                 }
+                echo "<br>";
+                echo $_SERVER['REMOTE_ADDR'];
                 //echo"<script>alert('" . $testArray . "')</script>";
             }
             else
             {
                 setcookie($firstvisit, $uri, time() + 84600 * 365, COOKIEPATH, COOKIE_DOMAIN);
             }
-        }
+
+        } // end create_cookie()
+
+        function test_input($data) 
+        {
+            $data = trim($data);
+            $data = stripslashes($data);
+            $data = htmlspecialchars($data);
+            return $data;
+          }
 
 
 
@@ -56,6 +67,11 @@ if ( !class_exists( 'WebaraTrackingCookie') )
     }
 
 }
-new WebaraTrackingCookie;
+new Webara_Tracking_Cookie_Plugin;
+
+// regex  search for an find utm_
+// $str = "?utm_source=facebook&utm_medium=cpc&utm_campaign=general-promo&utm_id=123&utm_term=term1%2Bterm2&utm_content=test-content";
+// $pattern = "/utm_/i"; // case insensitive 
+// echo preg_match($pattern, $str); // Outputs 1 true
 
 
