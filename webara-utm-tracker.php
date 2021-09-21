@@ -25,24 +25,29 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
         public function __construct()
         {
             add_action('init', array($this, 'init'));
-            add_action('wp_loaded', array($this, 'wp_loaded'));
+            //add_action('wp_loaded', array($this, 'wp_loaded'));
         }
 
         function init() 
         {
             $cookie_value = $this->get_URI();
             $cookie_count = $this->get_cookie_count();
-            echo "<br>".$cookie_count."<br>";
-            $cookie = new WTC_UTM_Cookie("wbr_ad_seen_0", $cookie_value);
+            $cookie_prefix = "wbr_ad_seen_";
+            $cookie_name = $cookie_prefix.$cookie_count;
+
+            echo "<br>Number of cookies".$cookie_count."<br>";
+            echo "<br>URI contains UTM params?".$this->check_uri_for_utm_params($cookie_value)."<br>";
+            
+            if ($this->check_uri_for_utm_params($cookie_value) === 1 )
+            {
+                $new_cookie = new WTC_UTM_Cookie($cookie_name, $cookie_value);
+                header("refresh: 1; url='".home_url()."'");   
+            }
+            
+            
             //$cookie2 = new WTC_UTM_Cookie("wbr_ad_seen_1", $uri);
             //$cookie3 = new WTC_UTM_Cookie("wbr_ad_seen_2", $uri);
             //$cookie4 = new WTC_UTM_Cookie("wbr_ad_seen_3", $uri);      
-        }
-
-        function wp_loaded()
-        {
-            $cookie_count_after = $this->get_cookie_count();
-            echo "<br>".$cookie_count_after."<br>";
         }
 
         function get_cookie_count() 
@@ -56,6 +61,20 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
                 }
             }
             return $cookie_count;
+        }
+
+        function check_uri_for_utm_params(string $uri) : int
+        {
+            $pattern = "/utm_/i"; // case insensitive 
+            if(preg_match($pattern, $uri) === 1)
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+
         }
 
 
@@ -75,11 +94,7 @@ if ( !class_exists( 'WTC_UTM_Cookie') )
     {        
         public function __construct($cookie_name = "wbr_ad_seen_", $cookie_value = "organic_traffic")
         {
-            //$this->cookie_name = $cookie_name;
-            //$this->cookie_value = $cookie_value;
             $this->create_new_cookie($cookie_name, $cookie_value);
-
-
         }
 
         function create_new_cookie($cookie_name, $cookie_value)
@@ -231,10 +246,7 @@ if ( ! function_exists( 'mv_save_wc_order_other_fields' ) )
 
 
 
-// regex  search for an find utm_
-// $str = "?utm_source=facebook&utm_medium=cpc&utm_campaign=general-promo&utm_id=123&utm_term=term1%2Bterm2&utm_content=test-content";
-// $pattern = "/utm_/i"; // case insensitive 
-// echo preg_match($pattern, $str); // Outputs 1 true
+
 
 
 // public $cookie_name;
