@@ -21,18 +21,43 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
 {
     class WTC_UTM_Plugin
     {
+            
         public function __construct()
         {
             add_action('init', array($this, 'init'));
+            add_action('wp_loaded', array($this, 'wp_loaded'));
         }
 
         function init() 
         {
-            echo "<br>";
-            echo $_SERVER['REMOTE_ADDR'];
-            echo "<br>";
-            echo $this->get_URI();
+            $cookie_value = $this->get_URI();
+            $cookie_count = $this->get_cookie_count();
+            echo "<br>".$cookie_count."<br>";
+            $cookie = new WTC_UTM_Cookie("wbr_ad_seen_0", $cookie_value);
+            //$cookie2 = new WTC_UTM_Cookie("wbr_ad_seen_1", $uri);
+            //$cookie3 = new WTC_UTM_Cookie("wbr_ad_seen_2", $uri);
+            //$cookie4 = new WTC_UTM_Cookie("wbr_ad_seen_3", $uri);      
         }
+
+        function wp_loaded()
+        {
+            $cookie_count_after = $this->get_cookie_count();
+            echo "<br>".$cookie_count_after."<br>";
+        }
+
+        function get_cookie_count() 
+        {
+            $cookie_count = 0;
+            foreach ($_COOKIE as $name => $value) 
+            {
+                if (strpos($name, 'wbr_ad_seen_') === 0 ) 
+                {
+                   $cookie_count++;
+                }
+            }
+            return $cookie_count;
+        }
+
 
         function get_URI()
         {
@@ -44,40 +69,34 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
     }
 }
 
-if ( !class_exists( 'WTC_UTM_Advert') )
-{
-    class WTC_UTM_Advert
-    {
-
-    }
-}
-
-$instance = new WTC_UTM_Plugin;
-
-
 if ( !class_exists( 'WTC_UTM_Cookie') )
 {
-    class WTC_Cookie
-    {
-        protected string $cookie_name = "wtc-utm-ad";
-        protected string $cookie_value = "";
-
-        public function __construct($cookie_name, $cookie_value)
+    class WTC_UTM_Cookie
+    {        
+        public function __construct($cookie_name = "wbr_ad_seen_", $cookie_value = "organic_traffic")
         {
-            $this->cookie_name = $cookie_name;
-            $this->cookie_value = $cookie_value;
+            //$this->cookie_name = $cookie_name;
+            //$this->cookie_value = $cookie_value;
+            $this->create_new_cookie($cookie_name, $cookie_value);
+
+
         }
 
-        private function create_new_cookie($cookie_name, $cookie_value) : void
+        function create_new_cookie($cookie_name, $cookie_value)
         {
             if (isset($_COOKIE[$cookie_name]))
             {
-                // COOKIE ALREADY SET
+                                
             }
             else
-            {
-                setcookie($cookie_name, $cookie_value, time() + 84600 * 365, COOKIEPATH, COOKIE_DOMAIN);
+            {   
+                setcookie($cookie_name, $cookie_value, time() + 84600 * 365, COOKIEPATH, COOKIE_DOMAIN, false, true);
             }
+        }
+
+        function get_cookie_count ()
+        {
+
         }
 
         function set_cookie_name (String $name) : void
@@ -103,9 +122,25 @@ if ( !class_exists( 'WTC_UTM_Cookie') )
     }
 }
 
+$instance = new WTC_UTM_Plugin;
+
+/**
+ *  RETRIEVE ANY COOKIE DATA WHEN AN ORDER IS PLACED
+*/
+
+add_action( 'woocommerce_new_order', 'webara_check_cookie_on_new_order' );
+
+if ( ! function_exists( 'webara_check_cookie_on_new_order' ) )
+{
+    function webara_check_cookie_on_new_order() 
+    {
+        // check cookie here
+    }
+}
+
+
 /** 
  *  DISPLAY 'AD HISTORY' META BOX WITHIN ADMIN AREA OF ORDER
- * 
 */
 
 // Add Meta Container to admin shop_order pages
@@ -180,6 +215,15 @@ if ( ! function_exists( 'mv_save_wc_order_other_fields' ) )
         update_post_meta( $post_id, '_my_field_slug', $_POST[ 'my_field_name' ] );
     }
 }
+
+
+// $cookie_name_prefix = "wbr_ad_seen_";
+
+//             $count =  var_dump($_COOKIE);
+//             foreach($_COOKIE as  $key => $val)
+//             {
+//               echo "<br> cookie name = ".$key.", and value = ".$val."<br><br>";
+//             }
 
 
 
