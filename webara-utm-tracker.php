@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Webara UTM Tracker
- * Description: Utilise cookies to identify which Facebook Ads have resulted in a purchase.
+ * Description: Use cookies to track URIs containing UTM parameters to build a history of which ads contributed to a sale.
  * Author: Jake Weir
  * Author URI: https://webara.co.uk
  * Version: 1.0.0
@@ -16,12 +16,10 @@ if ( !defined( 'ABSPATH' ) )
     exit;
 }
 
-
 if ( !class_exists( 'WTC_UTM_Plugin') )
 {
     class WTC_UTM_Plugin
-    {
-            
+    {  
         public function __construct()
         {
             add_action('init', array($this, 'init'));
@@ -35,19 +33,11 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
             $cookie_prefix = "wbr_ad_seen_";
             $cookie_name = $cookie_prefix.$cookie_count;
 
-            echo "<br>Number of cookies".$cookie_count."<br>";
-            echo "<br>URI contains UTM params?".$this->check_uri_for_utm_params($cookie_value)."<br>";
-            
             if ($this->check_uri_for_utm_params($cookie_value) === 1 )
             {
                 $new_cookie = new WTC_UTM_Cookie($cookie_name, $cookie_value);
-                header("refresh: 1; url='".home_url()."'");   
-            }
-            
-            
-            //$cookie2 = new WTC_UTM_Cookie("wbr_ad_seen_1", $uri);
-            //$cookie3 = new WTC_UTM_Cookie("wbr_ad_seen_2", $uri);
-            //$cookie4 = new WTC_UTM_Cookie("wbr_ad_seen_3", $uri);      
+                header("refresh: 0.5; url='".home_url()."'");   
+            }   
         }
 
         function get_cookie_count() 
@@ -65,15 +55,12 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
 
         function check_uri_for_utm_params(string $uri) : int
         {
-            $pattern = "/utm_/i"; // case insensitive 
+            $pattern = "/utm_/i";
             if(preg_match($pattern, $uri) === 1)
             {
                 return 1;
             }
-            else
-            {
-                return 0;
-            }
+            return 0;
 
         }
 
