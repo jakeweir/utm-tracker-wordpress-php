@@ -64,7 +64,6 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
 
         }
 
-
         function get_URI()
         {
             global $wp;
@@ -94,11 +93,6 @@ if ( !class_exists( 'WTC_UTM_Cookie') )
             {   
                 setcookie($cookie_name, $cookie_value, time() + 84600 * 365, COOKIEPATH, COOKIE_DOMAIN, false, true);
             }
-        }
-
-        function get_cookie_count ()
-        {
-
         }
 
         function set_cookie_name (String $name) : void
