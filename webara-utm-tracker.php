@@ -16,6 +16,7 @@ if ( !defined( 'ABSPATH' ) )
     exit;
 }
 
+// Driver class
 if ( !class_exists( 'WTC_UTM_Plugin') )
 {
     class WTC_UTM_Plugin
@@ -23,7 +24,7 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
         public function __construct()
         {
             add_action('init', array($this, 'init'));
-            //add_action('wp_loaded', array($this, 'wp_loaded'));
+            //add_action('woocommerce_new_order', array($this, 'check_cookies_on_new_order'));
         }
 
         function init() 
@@ -32,10 +33,14 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
             $cookie_count = $this->get_cookie_count();
             $cookie_prefix = "wbr_ad_seen_";
             $cookie_name = $cookie_prefix.$cookie_count;
+            $cookie_jar = $this->check_cookies_on_new_order();
+
+            var_dump($cookie_jar);
+                echo "<br><br>";
 
             if ($this->check_uri_for_utm_params($cookie_value) === 1 )
             {
-                $new_cookie = new WTC_UTM_Cookie($cookie_name, $cookie_value);
+                $cookie = new WTC_UTM_Cookie($cookie_name, $cookie_value);
                 header("refresh: 0.5; url='".home_url()."'");   
             }   
         }
@@ -43,7 +48,7 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
         function get_cookie_count() 
         {
             $cookie_count = 0;
-            foreach ($_COOKIE as $name => $value) 
+            foreach ($_COOKIE as $name => $value)
             {
                 if (strpos($name, 'wbr_ad_seen_') === 0 ) 
                 {
@@ -61,7 +66,6 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
                 return 1;
             }
             return 0;
-
         }
 
         function get_URI()
@@ -70,6 +74,30 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
             $uri = add_query_arg( $wp->query_vars, home_url( $wp->request ) );
             return $uri;
         }
+
+        function check_cookies_on_new_order()
+        {
+            $cookie_jar = array();
+            foreach ($_COOKIE as $name => $value)
+            {
+                if (strpos($name, 'wbr_ad_seen_') === 0 ) 
+                {
+                   $cookie_jar[$name] = $value;
+                }
+            }
+            return $cookie_jar;
+        }
+
+        // function get_params_from_cookie_jar($cookie_jar)
+        // {
+        //     $utm_params = array();
+
+        //     foreach($cookie_jar as $cookie => $value)
+        //     {
+        //         parse_str(strpbrk($value, "utm_"), $cookie_jar);
+        //         $utm_params[] = $value;
+        //     }
+        // } needs redone 
 
     }
 }
@@ -87,53 +115,20 @@ if ( !class_exists( 'WTC_UTM_Cookie') )
         {
             if (isset($_COOKIE[$cookie_name]))
             {
-                                
+                // ensure cookie with correct URL value is not overwritten  
             }
             else
             {   
-                setcookie($cookie_name, $cookie_value, time() + 84600 * 365, COOKIEPATH, COOKIE_DOMAIN, false, true);
+                setcookie($cookie_name, $cookie_value, time() + 84600 * 365, COOKIEPATH, COOKIE_DOMAIN, false, true);       
             }
         }
 
-        function set_cookie_name (String $name) : void
-        {
-            $this->cookie_name = $name;
-        }
-
-        function set_cookie_value (String $value) : void
-        {
-            $this->cookie_value = $value;
-        }
-
-        function get_cookie_name () : String
-        {
-            return $this->cookie_name;
-        }
-
-        function get_cookie_value () : String
-        {
-            return $this->cookie_value;
-        }
-
     }
 }
 
-$instance = new WTC_UTM_Plugin;
 
-/**
- *  RETRIEVE ANY COOKIE DATA WHEN AN ORDER IS PLACED
-*/
 
-add_action( 'woocommerce_new_order', 'webara_check_cookie_on_new_order' );
-
-if ( ! function_exists( 'webara_check_cookie_on_new_order' ) )
-{
-    function webara_check_cookie_on_new_order() 
-    {
-        // check cookie here
-    }
-}
-
+    
 
 /** 
  *  DISPLAY 'AD HISTORY' META BOX WITHIN ADMIN AREA OF ORDER
@@ -212,6 +207,8 @@ if ( ! function_exists( 'mv_save_wc_order_other_fields' ) )
     }
 }
 
+$wtc_utm_instance = new WTC_UTM_Plugin;
+
 
 // $cookie_name_prefix = "wbr_ad_seen_";
 
@@ -272,10 +269,7 @@ if ( ! function_exists( 'mv_save_wc_order_other_fields' ) )
 
 //         } // end create_cookie()
 
-// $cart = array();
-// for($i=0;$i<=5;$i++){
-//     $cart[] = $i;  
-// }
+
 
 // $j = "six";
 
