@@ -44,6 +44,7 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
         function get_cookie_count() 
         {
             $cookie_count = 0;
+            //
             foreach ($_COOKIE as $name => $value)
             {
                 if (strpos($name, 'wbr_ad_seen_') === 0 ) 
