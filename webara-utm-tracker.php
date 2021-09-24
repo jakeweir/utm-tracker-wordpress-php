@@ -23,8 +23,8 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
     {  
         public function __construct()
         {
-            add_action('init', array($this, 'init'));
-            //add_action('woocommerce_new_order', array($this, 'check_cookies_on_new_order'));
+            add_action('init', array($this, 'init'), 10, 0);
+            add_action('woocommerce_thankyou', array($this, 'on_new_woocommerce_order'));
         }
 
         function init() 
@@ -33,15 +33,12 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
             $cookie_count = $this->get_cookie_count();
             $cookie_prefix = "wbr_ad_seen_";
             $cookie_name = $cookie_prefix.$cookie_count;
-            $cookie_jar = $this->check_cookies_on_new_order();
 
             if ($this->check_uri_for_utm_params($cookie_value) === 1 )
             {
                 $cookie = new WTC_UTM_Cookie($cookie_name, $cookie_value);
                 header("refresh: 0.5; url='".home_url()."'");   
             }   
-
-            $split_params = $this->get_params_from_cookie_jar($cookie_jar);
         }
 
         function get_cookie_count() 
@@ -74,7 +71,7 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
             return $uri;
         }
 
-        function check_cookies_on_new_order()
+        function create_cookie_jar()
         {
             $cookie_jar = array();
             foreach ($_COOKIE as $name => $value)
@@ -97,9 +94,24 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
                 $utm_params[$cookie] = $new_value;
             }
             return $utm_params;
-        }
-        
+        }    
 
+        function on_new_woocommerce_order()
+        {   
+            $cookie_jar = $this->create_cookie_jar();
+            $cookies = $this->get_params_from_cookie_jar($cookie_jar);
+
+            foreach ($cookies as $cookie => $params)
+            {
+                echo "<br>Cookie:  ".$cookie;
+                foreach ($params as $key => $value)
+                {
+                    echo "<br>".$key." => ".$value;
+                }
+                
+                
+            }
+        }
     }
 }
 
@@ -129,7 +141,21 @@ if ( !class_exists( 'WTC_UTM_Cookie') )
 
 
 
-    
+
+$wtc_utm_instance = new WTC_UTM_Plugin;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /** 
  *  DISPLAY 'AD HISTORY' META BOX WITHIN ADMIN AREA OF ORDER
@@ -163,6 +189,14 @@ if ( ! function_exists( 'webara_add_ad_history_meta_box' ) )
 
     }
 }
+
+
+
+
+
+
+
+
 
 // Save the data of the Meta field
 add_action( 'save_post', 'mv_save_wc_order_other_fields', 10, 1 );
@@ -207,75 +241,3 @@ if ( ! function_exists( 'mv_save_wc_order_other_fields' ) )
         update_post_meta( $post_id, '_my_field_slug', $_POST[ 'my_field_name' ] );
     }
 }
-
-$wtc_utm_instance = new WTC_UTM_Plugin;
-
-
-// $cookie_name_prefix = "wbr_ad_seen_";
-
-//             $count =  var_dump($_COOKIE);
-//             foreach($_COOKIE as  $key => $val)
-//             {
-//               echo "<br> cookie name = ".$key.", and value = ".$val."<br><br>";
-//             }
-
-
-
-
-
-
-
-
-
-
-// public $cookie_name;
-//         protected $cookie_value;
-
-//         public function init() : void
-//         {
-            
-//         }
-
-
-
-
-
-        
-        
-
-
-
-// function create_cookie()
-//         {
-//             global $wp;
-//             $firstvisit = "first_visit";
-//             
-
-//             if (isset($_COOKIE[$firstvisit])) 
-//             {
-//                 parse_str(strpbrk($uri, "utm_"), $testArray);
-                
-//                 foreach ($testArray as $key => $value)
-//                 {
-//                     echo "<br>$key => $value";
-//                 }
-//                 echo "<br>";
-//                 echo $_SERVER['REMOTE_ADDR'];
-//                 //echo"<script>alert('" . $testArray . "')</script>";
-//             }
-//             else
-//             {
-//                 setcookie($firstvisit, $uri, time() + 84600 * 365, COOKIEPATH, COOKIE_DOMAIN);
-//             }
-
-//         } // end create_cookie()
-
-
-
-// $j = "six";
-
-// $cart[] = $j;
-
-// echo "<pre>";
-// print_r($cart);
-// echo "</pre>";
