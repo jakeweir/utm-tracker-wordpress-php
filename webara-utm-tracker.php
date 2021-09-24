@@ -35,14 +35,13 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
             $cookie_name = $cookie_prefix.$cookie_count;
             $cookie_jar = $this->check_cookies_on_new_order();
 
-            var_dump($cookie_jar);
-                echo "<br><br>";
-
             if ($this->check_uri_for_utm_params($cookie_value) === 1 )
             {
                 $cookie = new WTC_UTM_Cookie($cookie_name, $cookie_value);
                 header("refresh: 0.5; url='".home_url()."'");   
             }   
+
+            $split_params = $this->get_params_from_cookie_jar($cookie_jar);
         }
 
         function get_cookie_count() 
@@ -88,16 +87,18 @@ if ( !class_exists( 'WTC_UTM_Plugin') )
             return $cookie_jar;
         }
 
-        // function get_params_from_cookie_jar($cookie_jar)
-        // {
-        //     $utm_params = array();
+        function get_params_from_cookie_jar($cookie_jar)
+        {
+            $utm_params = array();
 
-        //     foreach($cookie_jar as $cookie => $value)
-        //     {
-        //         parse_str(strpbrk($value, "utm_"), $cookie_jar);
-        //         $utm_params[] = $value;
-        //     }
-        // } needs redone 
+            foreach($cookie_jar as $cookie => $value)
+            {
+                parse_str(strpbrk($value, "utm_"), $new_value);
+                $utm_params[$cookie] = $new_value;
+            }
+            return $utm_params;
+        }
+        
 
     }
 }
