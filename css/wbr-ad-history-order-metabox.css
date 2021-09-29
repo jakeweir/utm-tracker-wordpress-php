@@ -1,0 +1,43 @@
+.wbr-utm-metabox-before-ad{
+
+    padding: 0;
+    margin: 0;
+    line-height: 1.4em;
+    font-weight: bold;
+    font-size: 1em;
+
+}
+
+.wbr-utm-metabox-ad-title{
+
+    padding: 0;
+    margin: 0;
+    line-height: 1.2em;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 0.5em;
+
+}
+
+.wbr-utm-parameter-name{
+
+    padding: 0;
+    margin: 0;
+    line-height: 1.4em;
+    font-weight: bold;
+    font-size: 1em;
+    display: inline-block;
+
+}
+
+
+.wbr-utm-parameter-value{
+
+    padding: 0;
+    margin: 0;
+    margin-left: 0.5em;
+    line-height: 1.4em;
+    font-weight: normal;
+    font-size: 1em;
+    display: inline-block;
+}

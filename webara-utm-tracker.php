@@ -15,6 +15,17 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+add_action('admin_print_styles', 'utm_user_scripts');
+
+function utm_user_scripts()
+{
+    $plugin_url = plugin_dir_url(__FILE__);
+
+    wp_enqueue_style('wbr-ad-history-order-metabox.css',  $plugin_url . "/css/wbr-ad-history-order-metabox.css");
+}
+
+add_action('admin_print_styles', 'utm_user_scripts');
+
 if (!class_exists('WTC_UTM_Plugin')) {
     class WTC_UTM_Plugin
     {
@@ -29,6 +40,7 @@ if (!class_exists('WTC_UTM_Plugin')) {
         {
             $cookie_value = $this->get_URI();
             $cookie_count = $this->get_cookie_count();
+            // TODO admin area choose prefix 
             $cookie_prefix = "wbr_ad_seen_";
             $cookie_name = $cookie_prefix . $cookie_count;
 
@@ -110,18 +122,25 @@ if (!class_exists('WTC_UTM_Plugin')) {
         {
             $order = wc_get_order($order_id);
             $meta_data = $order->get_meta('_wtc_utm_ad_history', 'false');
+            $message_before_count = "This order was placed after the following ";
+            $message_after_count = " ad(s) directed your customer to your site.<br><br>The Ads are numbered in the order they were encountered.";
+            $ad_count = 1;
+
 
             if (is_array($meta_data) || is_object($meta_data)) {
+
+                echo __($message_before_count) . esc_html__(sizeof($meta_data)) . __($message_after_count) . "<br><br>";
                 foreach ($meta_data as $cookie_name => $values) {
-                    echo "Advert: " . esc_html($cookie_name) . "<br><br>";
+                    echo "<div class='wbr-utm-metabox-ad-title'>Advert "  . $ad_count . "</div>";
                     foreach ($values as $param => $value) {
-                        echo esc_html($param) . " : " . esc_html($value) . "<br>";
+                        echo "<p class='wbr-utm-parameter-name'>" . ucfirst(esc_html__((substr($param, 4)))) . " : " . "</p><p class='wbr-utm-parameter-value'>" . esc_html__($value) . "</p><br>";
                     }
                     echo "<br>";
-                }
+                    $ad_count++;
+                }                      //TODO create admin settings 
             } else {
-                $message = esc_html__("This order does not contain any advert history");
-                echo $message;
+                $message_no_history_found = esc_html__("This order does not contain any advert history");
+                echo $message_no_history_found;
             }
         }
     }
