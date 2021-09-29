@@ -10,13 +10,11 @@
  *  
  */
 
-// Exit if accessed directly 
 if (!defined('ABSPATH')) {
     echo "These aren't the droids you're looking for...";
     exit;
 }
 
-// Driver class
 if (!class_exists('WTC_UTM_Plugin')) {
     class WTC_UTM_Plugin
     {
@@ -122,7 +120,8 @@ if (!class_exists('WTC_UTM_Plugin')) {
                     echo "<br>";
                 }
             } else {
-                echo "Ad History unavailable for this order";
+                $message = esc_html__("This order does not contain any advert history");
+                echo $message;
             }
         }
     }
