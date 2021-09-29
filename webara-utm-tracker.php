@@ -23,20 +23,9 @@ if (!class_exists('WTC_UTM_Plugin')) {
         public function __construct()
         {
             add_action('init', array($this, 'init'), 10, 0);
-            //add_action('woocommerce_checkout_create_order', array($this, 'save_utm_as_meta'), 20, 1);
             add_action('woocommerce_thankyou', array($this, 'save_utm_as_meta'), 20, 1);
             add_action('load-post.php', array($this, 'setup_order_meta_box')); 
                       
-        }
-
-        function save_utm_as_meta( $order_id ) 
-        {
-            $cookies = $this->create_cookie_jar();
-            $meta = $this->get_params_from_cookie_jar($cookies);
-            $meta_sanitized = esc_url_raw($meta);
-            $order = wc_get_order($order_id);
-            $order->update_meta_data( '_wtc_utm_ad_history', $meta_sanitized );
-            $order->save();
         }
 
         function init()
@@ -76,8 +65,9 @@ if (!class_exists('WTC_UTM_Plugin')) {
         function get_URI()
         {
             global $wp;
-            $uri = add_query_arg($wp->query_vars, home_url($wp->request));
-            return esc_url($uri);
+            // $uri = add_query_arg($wp->query_vars, home_url($wp->request));
+            $uri = add_query_arg($wp->query_vars, '');
+            return esc_url_raw($uri);
         }
 
         function create_cookie_jar()
@@ -85,7 +75,7 @@ if (!class_exists('WTC_UTM_Plugin')) {
             $cookie_jar = array();
             foreach ($_COOKIE as $name => $value) {
                 if (strpos($name, 'wbr_ad_seen_') === 0) {
-                    $cookie_jar[$name] = $value;
+                    $cookie_jar[$name] = esc_url_raw($value);
                 }
             }
             return $cookie_jar;
@@ -113,6 +103,15 @@ if (!class_exists('WTC_UTM_Plugin')) {
             add_meta_box('wtc-utm-ad-history', esc_html__( 'Ad History', 'woocommerce' ), array($this, 'populate_ad_history_meta_box'), 'shop_order', 'side', 'core' );
         }
 
+        function save_utm_as_meta( $order_id ) 
+        {
+            $cookies = $this->create_cookie_jar();
+            $meta = $this->get_params_from_cookie_jar($cookies);
+            $order = wc_get_order($order_id);
+            $order->update_meta_data( '_wtc_utm_ad_history', $meta );
+            $order->save();
+        }
+
         function populate_ad_history_meta_box($order_id)
         {
             $order = wc_get_order($order_id);
@@ -120,13 +119,14 @@ if (!class_exists('WTC_UTM_Plugin')) {
 
             if (is_array($meta_data) || is_object($meta_data))
             {
-                foreach ($meta_data as $cookie => $values)
+                foreach ($meta_data as $cookie_name => $values)
                 {
-                    echo "Advert: ".$cookie."<br><br>";
+                    echo "Advert: ".esc_html($cookie_name)."<br><br>";
                     foreach($values as $param => $value)
                     {
-                        echo $param." : ".$value."<br>";
+                        echo esc_html($param)." : ".esc_html($value)."<br>";
                     }
+                    echo "<br>";
                 }
 
             }
