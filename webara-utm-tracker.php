@@ -24,8 +24,7 @@ if (!class_exists('WTC_UTM_Plugin')) {
         {
             add_action('init', array($this, 'init'), 10, 0);
             add_action('woocommerce_thankyou', array($this, 'save_utm_as_meta'), 20, 1);
-            add_action('load-post.php', array($this, 'setup_order_meta_box')); 
-                      
+            add_action('load-post.php', array($this, 'setup_order_meta_box'));
         }
 
         function init()
@@ -44,7 +43,6 @@ if (!class_exists('WTC_UTM_Plugin')) {
         function get_cookie_count()
         {
             $cookie_count = 0;
-            //
             foreach ($_COOKIE as $name => $value) {
                 if (strpos($name, 'wbr_ad_seen_') === 0) {
                     $cookie_count++;
@@ -65,7 +63,6 @@ if (!class_exists('WTC_UTM_Plugin')) {
         function get_URI()
         {
             global $wp;
-            // $uri = add_query_arg($wp->query_vars, home_url($wp->request));
             $uri = add_query_arg($wp->query_vars, '');
             return esc_url_raw($uri);
         }
@@ -84,14 +81,13 @@ if (!class_exists('WTC_UTM_Plugin')) {
         function get_params_from_cookie_jar($cookie_jar)
         {
             $utm_params = array();
-
             foreach ($cookie_jar as $cookie => $value) {
                 parse_str(strpbrk($value, "utm_"), $new_value);
                 $utm_params[$cookie] = $new_value;
             }
             return $utm_params;
         }
-      
+
 
         function setup_order_meta_box()
         {
@@ -100,15 +96,15 @@ if (!class_exists('WTC_UTM_Plugin')) {
 
         function add_order_meta_box()
         {
-            add_meta_box('wtc-utm-ad-history', esc_html__( 'Ad History', 'woocommerce' ), array($this, 'populate_ad_history_meta_box'), 'shop_order', 'side', 'core' );
+            add_meta_box('wtc-utm-ad-history', esc_html__('Ad History', 'woocommerce'), array($this, 'populate_ad_history_meta_box'), 'shop_order', 'side', 'core');
         }
 
-        function save_utm_as_meta( $order_id ) 
+        function save_utm_as_meta($order_id)
         {
             $cookies = $this->create_cookie_jar();
             $meta = $this->get_params_from_cookie_jar($cookies);
             $order = wc_get_order($order_id);
-            $order->update_meta_data( '_wtc_utm_ad_history', $meta );
+            $order->update_meta_data('_wtc_utm_ad_history', $meta);
             $order->save();
         }
 
@@ -117,21 +113,15 @@ if (!class_exists('WTC_UTM_Plugin')) {
             $order = wc_get_order($order_id);
             $meta_data = $order->get_meta('_wtc_utm_ad_history', 'false');
 
-            if (is_array($meta_data) || is_object($meta_data))
-            {
-                foreach ($meta_data as $cookie_name => $values)
-                {
-                    echo "Advert: ".esc_html($cookie_name)."<br><br>";
-                    foreach($values as $param => $value)
-                    {
-                        echo esc_html($param)." : ".esc_html($value)."<br>";
+            if (is_array($meta_data) || is_object($meta_data)) {
+                foreach ($meta_data as $cookie_name => $values) {
+                    echo "Advert: " . esc_html($cookie_name) . "<br><br>";
+                    foreach ($values as $param => $value) {
+                        echo esc_html($param) . " : " . esc_html($value) . "<br>";
                     }
                     echo "<br>";
                 }
-
-            }
-            else 
-            {    
+            } else {
                 echo "Ad History unavailable for this order";
             }
         }
@@ -157,169 +147,4 @@ if (!class_exists('WTC_UTM_Cookie')) {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 $wtc_utm_instance = new WTC_UTM_Plugin;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// /** 
-//  *  DISPLAY 'AD HISTORY' META BOX WITHIN ADMIN AREA OF ORDER
-//  */
-
-// // Add Meta Container to admin shop_order pages
-// add_action('add_meta_boxes', 'webara_add_meta_boxes');
-
-// if (!function_exists('webara_add_meta_boxes')) {
-//     function webara_add_meta_boxes()
-//     {
-//         add_meta_box('webara_ad_history', __('Ad History', 'woocommerce'), 'webara_add_ad_history_meta_box', 'shop_order', 'side', 'core');
-//     }
-// }
-
-// // Adding Meta field in the meta container admin shop_order pages
-// if (!function_exists('webara_add_ad_history_meta_box')) {
-//     function webara_add_ad_history_meta_box()
-//     {
-//         global $post;
-
-//         $meta_field_data = get_post_meta($post->ID, '_my_field_slug', true) ? get_post_meta($post->ID, '_my_field_slug', true) : '';
-
-//         echo "<div>test data" . $meta_field_data . "</div>";
-
-//         // echo '<input type="hidden" name="mv_other_meta_field_nonce" value="' . wp_create_nonce() . '">
-//         // <p style="border-bottom:solid 1px #eee;padding-bottom:13px;">
-//         //     <input type="text" style="width:250px;";" name="my_field_name" placeholder="' . $meta_field_data . '" value="' . $meta_field_data . '"></p>';
-
-//     }
-// }
-
-
-
-
-
-
-
-
-
-// // Save the data of the Meta field
-// add_action('save_post', 'mv_save_wc_order_other_fields', 10, 1);
-// if (!function_exists('mv_save_wc_order_other_fields')) {
-
-//     function mv_save_wc_order_other_fields($post_id)
-//     {
-
-//         // We need to verify this with the proper authorization (security stuff).
-
-//         // Check if our nonce is set.
-//         if (!isset($_POST['mv_other_meta_field_nonce'])) {
-//             return $post_id;
-//         }
-//         $nonce = $_REQUEST['mv_other_meta_field_nonce'];
-
-//         //Verify that the nonce is valid.
-//         if (!wp_verify_nonce($nonce)) {
-//             return $post_id;
-//         }
-
-//         // If this is an autosave, our form has not been submitted, so we don't want to do anything.
-//         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-//             return $post_id;
-//         }
-
-//         // Check the user's permissions.
-//         if ('page' == $_POST['post_type']) {
-
-//             if (!current_user_can('edit_page', $post_id)) {
-//                 return $post_id;
-//             }
-//         } else {
-
-//             if (!current_user_can('edit_post', $post_id)) {
-//                 return $post_id;
-//             }
-//         }
-//         // --- Its safe for us to save the data ! --- //
-
-//         // Sanitize user input  and update the meta field in the database.
-//         update_post_meta($post_id, '_my_field_slug', $_POST['my_field_name']);
-//     }
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// add_action('add_meta_boxes', array($this, 'webara_add_meta_box'));
-// add_action('woocommerce_checkout_update_order_meta', array($this, 'webara_woo_checkout_update_order_meta'));
-
-
-// function webara_woo_checkout_update_order_meta($order_id, $data) 
-// {
-//     $cookie_jar = $this->create_cookie_jar();
-//     $cookies = $this->get_params_from_cookie_jar($cookie_jar);
-
-//     add_post_meta($order_id, 'utm-params', $cookies);
-// }
-
-// function webara_add_meta_box()
-// {
-//     add_meta_box('webara_ad_history', __('Ad History', 'woocommerce'), 'webara_add_ad_history_meta_box', 'shop_order', 'side', 'core');
-// }
-
-// function webara_add_ad_history_meta_box()
-// {
-//     global $post;
-
-//     if(!empty($post->ID))
-//     {
-//         $ad_source = get_post_meta($post->ID, 'utm-source', true);
-//         echo 'Test:  ' . $ad_source;
-//     }
-
-// }
