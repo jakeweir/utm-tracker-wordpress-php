@@ -15,9 +15,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-add_action('admin_print_styles', 'utm_user_scripts');
+add_action('admin_print_styles', 'wbr_utm_user_scripts');
 
-function utm_user_scripts()
+function wbr_utm_user_scripts()
 {
     $plugin_url = plugin_dir_url(__FILE__);
 
