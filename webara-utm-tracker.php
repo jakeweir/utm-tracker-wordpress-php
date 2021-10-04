@@ -17,12 +17,16 @@ if (!defined('ABSPATH')) {
 
 add_action('admin_print_styles', 'wbr_utm_user_scripts');
 
-function wbr_utm_user_scripts()
+if (!function_exists('wbr_utm_user_scripts')) 
 {
+    function wbr_utm_user_scripts()
+    {
     $plugin_url = plugin_dir_url(__FILE__);
-
     wp_enqueue_style('wbr-ad-history-order-metabox.css',  $plugin_url . "/css/wbr-ad-history-order-metabox.css");
+    }
 }
+
+
 
 add_action('admin_print_styles', 'utm_user_scripts');
 
