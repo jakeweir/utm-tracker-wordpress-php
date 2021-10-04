@@ -27,9 +27,6 @@ if (!function_exists('wbr_utm_user_scripts'))
 }
 
 
-
-add_action('admin_print_styles', 'utm_user_scripts');
-
 if (!class_exists('WTC_UTM_Plugin')) {
     class WTC_UTM_Plugin
     {
