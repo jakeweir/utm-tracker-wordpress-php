@@ -21,11 +21,10 @@ if (!function_exists('wbr_utm_user_scripts'))
 {
     function wbr_utm_user_scripts()
     {
-    $plugin_url = plugin_dir_url(__FILE__);
-    wp_enqueue_style('wbr-ad-history-order-metabox.css',  $plugin_url . "/css/wbr-ad-history-order-metabox.css");
+        $plugin_url = plugin_dir_url(__FILE__);
+        wp_enqueue_style('wbr-ad-history-order-metabox.css',  $plugin_url . "/css/wbr-ad-history-order-metabox.css");
     }
 }
-
 
 if (!class_exists('WTC_UTM_Plugin')) {
     class WTC_UTM_Plugin
