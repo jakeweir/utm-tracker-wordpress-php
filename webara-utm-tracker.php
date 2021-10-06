@@ -145,7 +145,7 @@ if (!class_exists('WTC_UTM_Plugin'))
                 else 
                 {
                     $message_no_history_found = esc_html__("This order does not contain any advert history");
-                    echo $message_no_history_found."<br>";
+                    echo $message_no_history_found;
                 }
                 echo "<br><br>";
             }
