@@ -5,7 +5,7 @@
  * Description: Use cookies to track URIs containing UTM parameters to build a history of which ads contributed to a sale.
  * Author: Jake Weir
  * Author URI: https://webara.co.uk
- * Version: 1.1.0
+ * Version: 1.1.1
  * Text Domain: webara-utm-tracker
  *  
  */
@@ -40,9 +40,13 @@ if (!class_exists('WTC_UTM_Plugin'))
             if ($this->check_uri_for_utm_params($cookie_value) === 1) 
             {
                 $cookie = new WTC_UTM_Cookie($cookie_name, $cookie_value);
-                header("refresh: 0.5; url='" . home_url() . "'");
+                header("refresh: 0.5; url='" . $this->get_clean_uri($this->get_URI()) . "'");
             }
         }
+
+        function get_clean_uri(string $uri) {
+            return $clean_uri = strtok($uri, "?");
+          }
 
         function get_cookie_count()
         {
@@ -201,7 +205,7 @@ if (!class_exists('WTC_UTM_Cookie'))
             } 
             else 
             {
-                setcookie($cookie_name, $cookie_value, time() + 84600 * 365, COOKIEPATH, COOKIE_DOMAIN, true, true);
+                setcookie($cookie_name, $cookie_value, time() + 84600 * 365, COOKIEPATH, COOKIE_DOMAIN, false, true);
             }
         }
     }
