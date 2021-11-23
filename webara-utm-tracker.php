@@ -10,6 +10,7 @@
  *  
  */
 
+// Prevent direct access
 if (!defined('ABSPATH')) 
 {
     echo "These aren't the droids you're looking for...";
@@ -22,6 +23,7 @@ if (!class_exists('WTC_UTM_Plugin'))
     {
         public function __construct()
         {
+            // hook into WordPress
             add_action('init', array($this, 'init'), 10, 0);
             add_action('admin_print_styles', array($this, 'wbr_utm_user_scripts'));
             add_action('woocommerce_thankyou', array($this, 'save_utm_as_meta'), 20, 1);
@@ -29,7 +31,8 @@ if (!class_exists('WTC_UTM_Plugin'))
             add_action('woocommerce_email_order_meta', array($this, 'show_ad_history_in_admin_email'), 10, 2);
             
         }
-
+        
+        // initialize 
         function init()
         {
             $cookie_value = $this->get_URI();
@@ -40,10 +43,12 @@ if (!class_exists('WTC_UTM_Plugin'))
             if ($this->check_uri_for_utm_params($cookie_value) === 1) 
             {
                 $cookie = new WTC_UTM_Cookie($cookie_name, $cookie_value);
+                // sanitize URI after cookie creation to avoid duplication
                 header("refresh: 0.5; url='" . $this->get_clean_uri($this->get_URI()) . "'");
             }
         }
-
+        
+        // remove all params after ? and return clean URI
         function get_clean_uri(string $uri) {
             return $clean_uri = strtok($uri, "?");
           }
