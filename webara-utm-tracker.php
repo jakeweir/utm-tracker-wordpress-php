@@ -5,7 +5,7 @@
  * Description: Use cookies to track URIs containing UTM parameters to build a history of which ads contributed to a sale.
  * Author: Jake Weir
  * Author URI: https://webara.co.uk
- * Version: 1.1.1
+ * Version: 1.1.2
  * Text Domain: webara-utm-tracker
  *  
  */
@@ -26,8 +26,7 @@ if (!class_exists('WTC_UTM_Plugin'))
             add_action('admin_print_styles', array($this, 'wbr_utm_user_scripts'));
             add_action('woocommerce_thankyou', array($this, 'save_utm_as_meta'), 20, 1);
             add_action('load-post.php', array($this, 'setup_order_meta_box'));
-            add_action('woocommerce_email_order_meta', array($this, 'show_ad_history_in_admin_email'), 10, 2);
-            
+            add_action('woocommerce_order_status_pending_to_processing', array($this, 'add_ad_history_to_email_on_pending_to_processing'), 2);
         }
 
         function init()
@@ -40,13 +39,19 @@ if (!class_exists('WTC_UTM_Plugin'))
             if ($this->check_uri_for_utm_params($cookie_value) === 1) 
             {
                 $cookie = new WTC_UTM_Cookie($cookie_name, $cookie_value);
-                header("refresh: 0.5; url='" . $this->get_clean_uri($this->get_URI()) . "'");
+                header("refresh: 0.1; url='" . $this->get_clean_uri($this->get_URI()) . "'");
             }
         }
 
-        function get_clean_uri(string $uri) {
+        function add_ad_history_to_email_on_pending_to_processing() 
+        {
+            add_action('woocommerce_email_order_meta', array($this, 'show_ad_history_in_admin_email'), 10, 2);
+        }
+
+        function get_clean_uri(string $uri) 
+        {
             return $clean_uri = strtok($uri, "?");
-          }
+        }
 
         function get_cookie_count()
         {
