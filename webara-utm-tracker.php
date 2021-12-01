@@ -28,7 +28,14 @@ if (!class_exists('WTC_UTM_Plugin'))
             add_action('admin_print_styles', array($this, 'wbr_utm_user_scripts'));
             add_action('woocommerce_thankyou', array($this, 'save_utm_as_meta'), 20, 1);
             add_action('load-post.php', array($this, 'setup_order_meta_box'));
-            add_action('woocommerce_order_status_pending_to_processing', array($this, 'add_ad_history_to_email_on_pending_to_processing'), 2);
+            add_action('woocommerce_order_status_pending_to_on-hold', array($this, 'send_ad_history_to_email_on_status_change'), 2);
+            add_action('woocommerce_order_status_pending_to_processing', array($this, 'send_ad_history_to_email_on_status_change'), 2);
+            add_action('woocommerce_order_status_failed_to_processing', array($this, 'send_ad_history_to_email_on_status_change'), 2);
+            add_action('woocommerce_order_status_pending_to_completed', array($this, 'send_ad_history_to_email_on_status_change'), 2);
+            add_action('woocommerce_order_status_failed_to_completed', array($this, 'send_ad_history_to_email_on_status_change'), 2);
+
+            
+            
         }
         
         // initialize 
@@ -47,7 +54,7 @@ if (!class_exists('WTC_UTM_Plugin'))
             }
         }
 
-        function add_ad_history_to_email_on_pending_to_processing() 
+        function send_ad_history_to_email_on_status_change() 
         {
             add_action('woocommerce_email_order_meta', array($this, 'show_ad_history_in_admin_email'), 10, 2);
         }
